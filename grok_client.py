@@ -123,8 +123,9 @@ RULES:
 
 Return ONLY the JSON object, no additional text."""
 
+    model = os.environ.get("GROK_MODEL", "grok-3")
     response = client.chat.completions.create(
-        model="grok-beta",
+        model=model,
         messages=[
             {
                 "role": "system",
