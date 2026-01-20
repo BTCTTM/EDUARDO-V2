@@ -1,0 +1,15 @@
+# EDUARDO-V2 Dependencies
+
+# AI/LLM APIs
+openai>=1.0.0          # GPT and Grok (OpenAI-compatible)
+anthropic>=0.18.0      # Claude
+
+# Trading
+alpaca-py>=0.13.0      # Alpaca trading API
+
+# Scheduling
+schedule>=1.2.0        # Task scheduling
+pytz>=2024.1           # Timezone handling
+
+# Utilities
+python-dotenv>=1.0.0   # Environment variable management (optional)

@@ -1,6 +1,3 @@
-# API Keys - NEVER commit these
-api_keys.py
-
 # Python
 __pycache__/
 *.py[cod]
@@ -44,3 +41,11 @@ EDUARDO-V2-MAIN/
 # OS
 .DS_Store
 Thumbs.db
+
+# Logs
+*.log
+eduardo.log
+
+# Temp files
+temp.txt
+OS_var_names.txt
