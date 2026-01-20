@@ -33,6 +33,7 @@ jupyter-check-points/
 env/
 venv/
 ENV/
+EDUARDO-V2-MAIN/
 
 # IDE
 .idea/
