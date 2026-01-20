@@ -11,16 +11,10 @@ from models import InvestmentDecision, TradeResult
 
 def get_alpaca_client() -> TradingClient:
     """Initialize Alpaca client with API keys from environment."""
-    api_key = os.environ.get("ALPACA_API_KEY")
-    api_secret = os.environ.get("ALPACA_API_SECRET")
-    
-    if not api_key or not api_secret:
-        raise ValueError("ALPACA_API_KEY and ALPACA_API_SECRET environment variables must be set")
-    
-    # Use paper trading by default (set ALPACA_LIVE=true for live trading)
-    paper = os.environ.get("ALPACA_LIVE", "false").lower() != "true"
-    
-    return TradingClient(api_key, api_secret, paper=paper)
+    api_key = os.environ.get("eduardo_v2_key")
+    api_secret = os.environ.get("eduardo_v2_secret")
+    #potential to do: specify paper trading
+    return TradingClient(api_key, api_secret)
 
 
 def get_account_info() -> dict:

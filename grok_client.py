@@ -6,6 +6,8 @@ import os
 import json
 from openai import OpenAI
 from typing import List
+from xai_sdk import Client
+from xai_sdk.chat import user, system
 from models import (
     CompanyPick, 
     FundamentalData, 
@@ -123,9 +125,8 @@ RULES:
 
 Return ONLY the JSON object, no additional text."""
 
-    model = os.environ.get("GROK_MODEL", "grok-3")
     response = client.chat.completions.create(
-        model=model,
+        model='grok-4',
         messages=[
             {
                 "role": "system",

@@ -3,3 +3,12 @@ claude_main
 grok_main
 
 gpt_main
+
+eduardo_v2_secret
+
+eduardo_v2_key
+
+activate venv:
+
+.\EDUARDO-V2-MAIN\Scripts\Activate.ps1
+
