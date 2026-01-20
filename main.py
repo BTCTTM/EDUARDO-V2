@@ -19,6 +19,7 @@ from claude_client import analyze_fundamentals
 from grok_client import make_investment_decision
 from alpaca_client import get_account_info, execute_trades, check_market_open
 from models import TradeResult
+from openai import RateLimitError
 
 # Configure logging
 logging.basicConfig(
@@ -58,7 +59,14 @@ def run_trading_pipeline() -> bool:
         
         # Step 2: GPT researches and picks 5 companies
         logger.info("Step 2: GPT researching news and selecting companies...")
-        gpt_response = research_companies()
+        try:
+            gpt_response = research_companies()
+        except RateLimitError as e:
+            # Common case: insufficient_quota. Retrying won't help until billing/quota is fixed.
+            logger.error("OpenAI request failed (RateLimitError). This usually means your API key has no remaining quota/billing.")
+            logger.error("Fix: check your OpenAI billing/usage, then re-run.")
+            logger.error(f"Details: {e}")
+            return False
         
         logger.info(f"  GPT selected {len(gpt_response.picks)} companies:")
         for pick in gpt_response.picks:
@@ -95,9 +103,9 @@ def run_trading_pipeline() -> bool:
         all_successful = True
         for result in trade_results:
             if result.success:
-                logger.info(f"  ✓ {result.action} {result.shares} {result.ticker} @ ${result.price:.2f} = ${result.total_value:,.2f}")
+                logger.info(f"  OK: {result.action} {result.shares} {result.ticker} @ ${result.price:.2f} = ${result.total_value:,.2f}")
             else:
-                logger.error(f"  ✗ Failed to {result.action} {result.ticker}: {result.error_message}")
+                logger.error(f"  FAIL: Failed to {result.action} {result.ticker}: {result.error_message}")
                 all_successful = False
         
         if not trade_results:

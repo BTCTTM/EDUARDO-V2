@@ -3,7 +3,7 @@ GPT Client for news research and company selection.
 """
 import os
 import json
-from openai import OpenAI
+from openai import OpenAI, RateLimitError
 from models import CompanyPick, GPTResponse
 
 
@@ -12,7 +12,8 @@ def get_gpt_client() -> OpenAI:
     api_key = os.environ.get("gpt_main")
     if not api_key:
         raise ValueError("gpt_main environment variable not set")
-    return OpenAI(api_key=api_key)
+    # Fail fast on quota errors rather than retrying multiple times.
+    return OpenAI(api_key=api_key, max_retries=0)
 
 
 def research_companies() -> GPTResponse:
@@ -53,21 +54,26 @@ Return your response as a JSON object with the following structure:
 
 Return ONLY the JSON object, no additional text."""
 
-    response = client.chat.completions.create(
-        model="gpt-4o",
-        messages=[
-            {
-                "role": "system",
-                "content": "You are a financial research analyst providing investment recommendations based on current news and market analysis. Always respond with valid JSON."
-            },
-            {
-                "role": "user", 
-                "content": prompt
-            }
-        ],
-        temperature=0.7,
-        response_format={"type": "json_object"}
-    )
+    model = os.environ.get("GPT_MODEL", "gpt-4o")
+    try:
+        response = client.chat.completions.create(
+            model=model,
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a financial research analyst providing investment recommendations based on current news and market analysis. Always respond with valid JSON."
+                },
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
+            temperature=0.7,
+            response_format={"type": "json_object"}
+        )
+    except RateLimitError:
+        # Bubble up cleanly; main.py handles this with an actionable message.
+        raise
     
     content = response.choices[0].message.content
     data = json.loads(content)

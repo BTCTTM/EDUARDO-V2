@@ -48,14 +48,14 @@ class EduardoScheduler:
             success = self.task_func()
             
             if success:
-                logger.info("✓ Task completed successfully")
+                logger.info("OK: Task completed successfully")
                 self.retry_scheduled = False
             else:
-                logger.warning("✗ Task failed - scheduling retry for tomorrow")
+                logger.warning("FAIL: Task failed - scheduling retry for tomorrow")
                 self._schedule_retry()
                 
         except Exception as e:
-            logger.error(f"✗ Task failed with exception: {e}")
+            logger.error(f"FAIL: Task failed with exception: {e}")
             logger.exception("Full traceback:")
             self._schedule_retry()
     
@@ -75,11 +75,11 @@ class EduardoScheduler:
         try:
             success = self.task_func()
             if success:
-                logger.info("✓ Retry successful")
+                logger.info("OK: Retry successful")
             else:
-                logger.warning("✗ Retry failed - will try again next Monday")
+                logger.warning("FAIL: Retry failed - will try again next Monday")
         except Exception as e:
-            logger.error(f"✗ Retry failed with exception: {e}")
+            logger.error(f"FAIL: Retry failed with exception: {e}")
         
         # Cancel this retry job
         return schedule.CancelJob
