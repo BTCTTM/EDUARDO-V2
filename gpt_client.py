@@ -87,6 +87,10 @@ Return ONLY the JSON object, no additional text."""
         )
         for p in data["picks"]
     ]
+
+    #test print
+    print(picks)
+    print(data)
     
     return GPTResponse(picks=picks)
 

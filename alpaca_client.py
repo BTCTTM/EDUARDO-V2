@@ -7,8 +7,10 @@ from alpaca.trading.client import TradingClient
 from alpaca.trading.requests import MarketOrderRequest
 from alpaca.trading.enums import OrderSide, TimeInForce
 from models import InvestmentDecision, TradeResult
+from alpaca.data.requests import StockLatestQuoteRequest
+from alpaca.data.historical import StockHistoricalDataClient
 
-
+#todo: have grok make investment decision AFTER pulling account balance, he nneds to pull stock value
 def get_alpaca_client() -> TradingClient:
     """Initialize Alpaca client with API keys from environment."""
     api_key = os.environ.get("eduardo_v2_key")
@@ -52,6 +54,18 @@ def get_account_info() -> dict:
     }
 
 
+def get_current_stock_price(symbol: str) -> float:
+    data_client = StockHistoricalDataClient(
+        os.environ["eduardo_v2_key"],
+        os.environ["eduardo_v2_secret"],
+    )
+
+    req = StockLatestQuoteRequest(symbol_or_symbols=symbol)  # <-- FIX
+    quotes = data_client.get_stock_latest_quote(req)
+    q = quotes[symbol]
+
+    return float(q.ask_price)
+
 def execute_trades(decisions: List[InvestmentDecision]) -> List[TradeResult]:
     """
     Execute trades based on Grok's investment decisions.
@@ -79,16 +93,18 @@ def execute_trades(decisions: List[InvestmentDecision]) -> List[TradeResult]:
             )
             
             order = client.submit_order(order_data)
-            
+            account_details = get_account_positions()
+
             # Get filled price (may need to wait for fill in real scenario)
-            filled_price = float(order.filled_avg_price) if order.filled_avg_price else 0.0
+            #filled_price = float(order.filled_avg_price) if order.filled_avg_price else 0.0
+            real_filled = get_current_stock_price(decision.ticker)
             
             results.append(TradeResult(
                 ticker=decision.ticker,
                 shares=decision.shares,
                 action="BUY",
-                price=filled_price,
-                total_value=filled_price * decision.shares,
+                price=real_filled,
+                total_value=real_filled * decision.shares,
                 success=True,
                 order_id=str(order.id)
             ))
