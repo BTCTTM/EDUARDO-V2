@@ -93,11 +93,12 @@ YOUR TASK:
    - Debt levels and financial health
    - News catalyst strength
    - Risk/reward ratio
-3. Decide which company/companies to invest in
-4. Determine exact number of shares to buy based on:
+3. Decide which company/companies to invest in OR divest from
+4. Determine exact number of shares to BUY or SELL based on:
    - Available capital: ${available_capital:,.2f}
    - Position sizing (max 25% of capital per position)
    - Risk tolerance (conservative approach)
+   - Current holdings that may need to be sold
 
 Return your response as a JSON object:
 {{
@@ -110,6 +111,15 @@ Return your response as a JSON object:
             "rationale": "Quantitative reasoning for this decision",
             "confidence": 0.85,
             "risk_assessment": "Low/Medium/High with explanation"
+        }},
+        {{
+            "company": "Another Company",
+            "ticker": "ANTH",
+            "action": "SELL",
+            "shares": 50,
+            "rationale": "Reason for selling (e.g. overvalued, taking profits, rebalancing)",
+            "confidence": 0.75,
+            "risk_assessment": "Medium - locking in gains"
         }}
     ],
     "portfolio_risk_analysis": "Overall assessment of portfolio risk after these trades",
@@ -117,9 +127,11 @@ Return your response as a JSON object:
 }}
 
 RULES:
-- Only recommend BUY actions for companies you're confident in
+- Use "BUY" for new purchases
+- Use "SELL" to reduce or exit positions you currently hold
 - Be conservative with position sizing
 - Never invest more than available capital
+- Never sell more shares than currently held
 - Provide specific share counts based on approximate current prices
 - Confidence should be 0-1 scale based on data quality
 

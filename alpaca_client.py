@@ -69,6 +69,7 @@ def get_current_stock_price(symbol: str) -> float:
 def execute_trades(decisions: List[InvestmentDecision]) -> List[TradeResult]:
     """
     Execute trades based on Grok's investment decisions.
+    Supports both BUY and SELL orders.
     
     Args:
         decisions: List of investment decisions from Grok
@@ -80,29 +81,27 @@ def execute_trades(decisions: List[InvestmentDecision]) -> List[TradeResult]:
     results = []
     
     for decision in decisions:
-        if decision.action != "BUY" or decision.shares <= 0:
+        if decision.action not in ("BUY", "SELL") or decision.shares <= 0:
             continue
+        
+        # Map action to OrderSide
+        side = OrderSide.BUY if decision.action == "BUY" else OrderSide.SELL
             
         try:
-            # Create market order
             order_data = MarketOrderRequest(
                 symbol=decision.ticker,
                 qty=decision.shares,
-                side=OrderSide.BUY,
+                side=side,
                 time_in_force=TimeInForce.DAY
             )
             
             order = client.submit_order(order_data)
-            account_details = get_account_positions()
-
-            # Get filled price (may need to wait for fill in real scenario)
-            #filled_price = float(order.filled_avg_price) if order.filled_avg_price else 0.0
             real_filled = get_current_stock_price(decision.ticker)
             
             results.append(TradeResult(
                 ticker=decision.ticker,
                 shares=decision.shares,
-                action="BUY",
+                action=decision.action,
                 price=real_filled,
                 total_value=real_filled * decision.shares,
                 success=True,
@@ -113,7 +112,7 @@ def execute_trades(decisions: List[InvestmentDecision]) -> List[TradeResult]:
             results.append(TradeResult(
                 ticker=decision.ticker,
                 shares=decision.shares,
-                action="BUY",
+                action=decision.action,
                 price=0.0,
                 total_value=0.0,
                 success=False,
